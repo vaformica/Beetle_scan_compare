@@ -20,3 +20,8 @@ unmatched_images_*.csv
 *.tiff
 *.bmp
 *.webp
+
+# Project-owned documentation and application artwork are safe to publish.
+# Research/source images remain ignored everywhere else.
+!assets/*.png
+!docs/images/*.png
