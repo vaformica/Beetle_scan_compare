@@ -15,8 +15,8 @@ and records rapid approve/reject decisions without modifying source images.
   exports.
 - Conservative one-to-one fuzzy matching that reports ambiguous files rather
   than guessing.
-- New two-FFB macOS application icon based on a dorsal forked fungus beetle
-  reference.
+- High-contrast two-FFB macOS application icon based on a dorsal forked fungus
+  beetle reference and optimized for small Dock/Finder sizes.
 - Standalone Apple Silicon application containing its Python and Pillow runtime.
 
 ## Installation

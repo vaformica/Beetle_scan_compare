@@ -58,7 +58,9 @@ change. The build script adds artifact verification automatically.
 
 The macOS build uses `assets/BeetleScanCompare.icns`. Its 1024-pixel source is
 retained beside it so future icon revisions can be resized into a replacement
-iconset without degrading a smaller derivative.
+iconset without degrading a smaller derivative. The original dark icon remains
+at `assets/beetle-scan-compare-icon-dark-v1.png`; the unversioned source and
+`.icns` are the lighter, high-contrast defaults for the next build.
 
 ## Pull requests
 
