@@ -29,6 +29,20 @@ python3.12 -m venv .venv-build
 The standalone app and DMG are written beneath `dist/`. Build artifacts are
 excluded from Git.
 
+Every successful build also creates two paste-ready GitHub files:
+
+- `dist/GITHUB_RELEASE_SUMMARY.txt` for the short release summary; and
+- `dist/GITHUB_RELEASE_DESCRIPTION.md` for the full description, artifact name,
+  and automatically calculated SHA-256 checksum.
+
+Update `packaging/GITHUB_RELEASE_TEMPLATE.md` and
+`packaging/GITHUB_RELEASE_SUMMARY.txt` whenever the user-visible release notes
+change. The build script adds artifact verification automatically.
+
+The macOS build uses `assets/BeetleScanCompare.icns`. Its 1024-pixel source is
+retained beside it so future icon revisions can be resized into a replacement
+iconset without degrading a smaller derivative.
+
 ## Pull requests
 
 Describe the user-visible change, add or update tests, and note any change to

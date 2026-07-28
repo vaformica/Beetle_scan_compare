@@ -1,0 +1,1 @@
+Apple Silicon macOS release of Beetle Scan Compare: rapid side-by-side FFB scan review with conservative filename matching, sustained image preloading, independent zoom/pan, complete matched-pair and rejected-pair navigation, CSV exports, and the new two-FFB app icon.

@@ -1,5 +1,11 @@
 # Beetle Scan Compare
 
+<p align="center">
+  <img src="assets/beetle-scan-compare-icon-source.png"
+       alt="Beetle Scan Compare icon with two forked fungus beetles"
+       width="220">
+</p>
+
 A local Mac desktop program for rapidly comparing two folders of beetle scan
 images side by side. It matches close (but not necessarily identical) filenames,
 filters to dorsal (`-D`), ventral (`-V`), or right-side (`-R`) images, and records
@@ -48,6 +54,9 @@ The current DMG is for Apple Silicon Macs (M1, M2, M3, M4, or newer). Because
 this is an unsigned research build, macOS may require a Control-click on the app
 followed by **Open** the first time. Do not bypass a warning for a copy received
 from an untrusted source.
+
+Each local DMG build also generates paste-ready GitHub summary and description
+files in `dist/`, including the installer SHA-256 checksum.
 
 ### Installation from source
 
@@ -122,7 +131,7 @@ unmatched export so they can be audited.
 ## CSV outputs
 
 `review_decisions_YYYYMMDD_HHMMSS.csv` contains both filenames, match score,
-decision (`approved`, `rejected`, or `not_reviewed`), and timestamp..
+decision (`approved`, `rejected`, or `not_reviewed`), and timestamp.
 
 `unmatched_images_YYYYMMDD_HHMMSS.csv` contains the folder side, full filename,
 and reason. It reports missing matches in both directions.
@@ -137,3 +146,6 @@ sample of proposed matches and inspect the unmatched list. See
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+The application icon was generated for this project using OpenAI image
+generation and converted into a multi-resolution macOS icon resource.

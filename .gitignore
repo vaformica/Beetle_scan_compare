@@ -8,6 +8,7 @@ __pycache__/
 .pyinstaller-cache/
 build/
 dist/
+*.spec
 *.egg-info/
 current_review.csv
 review_decisions_*.csv

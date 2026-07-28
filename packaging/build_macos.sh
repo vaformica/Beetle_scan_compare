@@ -21,6 +21,7 @@ rm -rf build "dist/$APP_NAME.app" "$APP_NAME.spec"
   --windowed \
   --name "$APP_NAME" \
   --paths "$PWD" \
+  --icon "assets/BeetleScanCompare.icns" \
   --osx-bundle-identifier "org.beetlescan.compare" \
   --target-arch arm64 \
   packaging/macos_entry.py
@@ -45,4 +46,17 @@ hdiutil create \
   -format UDZO \
   "dist/$DMG_NAME"
 
+DMG_SHA256="$(shasum -a 256 "dist/$DMG_NAME" | awk '{print $1}')"
+cp "packaging/GITHUB_RELEASE_SUMMARY.txt" "dist/GITHUB_RELEASE_SUMMARY.txt"
+{
+  cat "packaging/GITHUB_RELEASE_TEMPLATE.md"
+  echo
+  echo "## Download verification"
+  echo
+  echo "- File: \`$DMG_NAME\`"
+  echo "- SHA-256: \`$DMG_SHA256\`"
+} > "dist/GITHUB_RELEASE_DESCRIPTION.md"
+
 echo "Created dist/$DMG_NAME"
+echo "Created dist/GITHUB_RELEASE_SUMMARY.txt"
+echo "Created dist/GITHUB_RELEASE_DESCRIPTION.md"
