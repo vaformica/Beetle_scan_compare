@@ -149,9 +149,9 @@ class CompareApp(tk.Tk):
         review_area = ttk.Panedwindow(self, orient="horizontal")
         review_area.pack(fill="both", expand=True)
         comparison_area = ttk.Frame(review_area)
-        rejected_area = ttk.Frame(review_area, padding=(8, 4, 12, 8))
+        navigation_area = ttk.Frame(review_area, padding=(8, 4, 12, 8))
         review_area.add(comparison_area, weight=5)
-        review_area.add(rejected_area, weight=1)
+        review_area.add(navigation_area, weight=1)
 
         names = ttk.Frame(comparison_area, padding=(12, 4))
         names.pack(fill="x")
@@ -177,33 +177,98 @@ class CompareApp(tk.Tk):
         self.image_frame = images
         self._activate_image("left")
 
-        ttk.Label(rejected_area, text="Rejected Pairs", font=("TkDefaultFont", 13, "bold")).pack(
+        ttk.Label(navigation_area, text="Pair Navigator", font=("TkDefaultFont", 13, "bold")).pack(
             anchor="w", pady=(0, 2)
         )
-        ttk.Label(rejected_area, text="Double-click a pair to revisit it.", foreground="#555555").pack(
+        ttk.Label(navigation_area, text="Double-click any row to jump to it.", foreground="#555555").pack(
             anchor="w", pady=(0, 8)
         )
-        rejected_scroll = ttk.Scrollbar(rejected_area, orient="vertical")
-        rejected_scroll.pack(side="right", fill="y")
-        self.rejected_list = ttk.Treeview(
-            rejected_area,
-            columns=("left", "right"),
+        navigator = ttk.Notebook(navigation_area)
+        navigator.pack(fill="both", expand=True)
+
+        all_tab = ttk.Frame(navigator)
+        rejected_tab = ttk.Frame(navigator)
+        navigator.add(all_tab, text="All Matched Pairs")
+        navigator.add(rejected_tab, text="Rejected Pairs")
+
+        all_table_frame = ttk.Frame(all_tab)
+        all_table_frame.pack(fill="both", expand=True)
+        all_y_scroll = ttk.Scrollbar(all_table_frame, orient="vertical")
+        all_x_scroll = ttk.Scrollbar(all_table_frame, orient="horizontal")
+        self.all_pairs_list = ttk.Treeview(
+            all_table_frame,
+            columns=("number", "left", "right", "score", "decision"),
             show="headings",
             selectmode="browse",
-            yscrollcommand=rejected_scroll.set,
+            yscrollcommand=all_y_scroll.set,
+            xscrollcommand=all_x_scroll.set,
             height=18,
         )
+        for column, label, width in (
+            ("number", "#", 45),
+            ("left", "Folder 1", 180),
+            ("right", "Folder 2", 180),
+            ("score", "Match %", 70),
+            ("decision", "Decision", 85),
+        ):
+            self.all_pairs_list.heading(column, text=label)
+            self.all_pairs_list.column(column, width=width, minwidth=40, stretch=column in {"left", "right"})
+        self.all_pairs_list.grid(row=0, column=0, sticky="nsew")
+        all_y_scroll.grid(row=0, column=1, sticky="ns")
+        all_x_scroll.grid(row=1, column=0, sticky="ew")
+        all_y_scroll.configure(command=self.all_pairs_list.yview)
+        all_x_scroll.configure(command=self.all_pairs_list.xview)
+        all_table_frame.columnconfigure(0, weight=1)
+        all_table_frame.rowconfigure(0, weight=1)
+        self.all_pairs_list.bind(
+            "<Double-1>", lambda event: self._jump_from_table(self.all_pairs_list, "matched", event)
+        )
+        self.all_pairs_list.bind(
+            "<Return>", lambda event: self._jump_from_table(self.all_pairs_list, "matched", event)
+        )
+        ttk.Button(
+            all_tab,
+            text="Show Selected Pair",
+            command=lambda: self._jump_from_table(self.all_pairs_list, "matched"),
+        ).pack(fill="x", pady=(8, 0))
+
+        rejected_table_frame = ttk.Frame(rejected_tab)
+        rejected_table_frame.pack(fill="both", expand=True)
+        rejected_y_scroll = ttk.Scrollbar(rejected_table_frame, orient="vertical")
+        rejected_x_scroll = ttk.Scrollbar(rejected_table_frame, orient="horizontal")
+        self.rejected_list = ttk.Treeview(
+            rejected_table_frame,
+            columns=("number", "left", "right"),
+            show="headings",
+            selectmode="browse",
+            yscrollcommand=rejected_y_scroll.set,
+            xscrollcommand=rejected_x_scroll.set,
+            height=18,
+        )
+        self.rejected_list.heading("number", text="#")
         self.rejected_list.heading("left", text="Folder 1")
         self.rejected_list.heading("right", text="Folder 2")
-        self.rejected_list.column("left", width=150, minwidth=90)
-        self.rejected_list.column("right", width=150, minwidth=90)
-        self.rejected_list.pack(fill="both", expand=True)
-        rejected_scroll.configure(command=self.rejected_list.yview)
-        self.rejected_list.bind("<Double-1>", self._revisit_rejection)
-        self.rejected_list.bind("<Return>", self._revisit_rejection)
-        ttk.Button(rejected_area, text="Show Selected Pair", command=self._revisit_rejection).pack(
-            fill="x", pady=(8, 0)
+        self.rejected_list.column("number", width=45, minwidth=40, stretch=False)
+        self.rejected_list.column("left", width=180, minwidth=90)
+        self.rejected_list.column("right", width=180, minwidth=90)
+        self.rejected_list.grid(row=0, column=0, sticky="nsew")
+        rejected_y_scroll.grid(row=0, column=1, sticky="ns")
+        rejected_x_scroll.grid(row=1, column=0, sticky="ew")
+        rejected_y_scroll.configure(command=self.rejected_list.yview)
+        rejected_x_scroll.configure(command=self.rejected_list.xview)
+        rejected_table_frame.columnconfigure(0, weight=1)
+        rejected_table_frame.rowconfigure(0, weight=1)
+        self.rejected_list.bind(
+            "<Double-1>", lambda event: self._jump_from_table(self.rejected_list, "rejected", event)
         )
+        self.rejected_list.bind(
+            "<Return>", lambda event: self._jump_from_table(self.rejected_list, "rejected", event)
+        )
+        ttk.Button(
+            rejected_tab,
+            text="Show Selected Pair",
+            command=lambda: self._jump_from_table(self.rejected_list, "rejected"),
+        ).pack(fill="x", pady=(8, 0))
 
         footer = ttk.Frame(self, padding=12)
         footer.pack(fill="x")
@@ -244,7 +309,7 @@ class CompareApp(tk.Tk):
         self.index = 0
         self.rapid = False
         self.zoom = {"left": 1.0, "right": 1.0}
-        self._refresh_rejections()
+        self._refresh_pair_lists()
         self._show()
         self.status.set(
             f"{len(self.result.matches)} pairs · "
@@ -266,6 +331,10 @@ class CompareApp(tk.Tk):
         self.right_name.config(text=match.right.path.name + f" — match {match.score:.1f}%")
         self._render_images()
         self._prefetch_upcoming()
+        item_id = str(self.index)
+        if self.all_pairs_list.exists(item_id):
+            self.all_pairs_list.selection_set(item_id)
+            self.all_pairs_list.see(item_id)
         self.status.set(f"Pair {self.index + 1} of {len(self.result.matches)}")
 
     def _render_images(self) -> None:
@@ -369,7 +438,7 @@ class CompareApp(tk.Tk):
             return
         self.rapid = True
         self.session.decide(self.index, status)
-        self._refresh_rejections()
+        self._refresh_pair_lists()
         if self.index < len(self.result.matches) - 1:
             self.index += 1
         self._show()
@@ -383,12 +452,27 @@ class CompareApp(tk.Tk):
             decisions, unmatched = self.session.export(Path(destination))
             messagebox.showinfo("Export complete", f"Saved:\n{decisions.name}\n{unmatched.name}")
 
-    def _refresh_rejections(self) -> None:
-        children = self.rejected_list.get_children()
-        if children:
-            self.rejected_list.delete(*children)
-        if not self.session:
+    def _refresh_pair_lists(self) -> None:
+        for table in (self.all_pairs_list, self.rejected_list):
+            children = table.get_children()
+            if children:
+                table.delete(*children)
+        if not self.session or not self.result:
             return
+        for index, match in enumerate(self.result.matches):
+            decision = self.session.decisions.get(index)
+            self.all_pairs_list.insert(
+                "",
+                "end",
+                iid=str(index),
+                values=(
+                    index + 1,
+                    match.left.path.name,
+                    match.right.path.name,
+                    f"{match.score:.1f}",
+                    decision.status if decision else "not reviewed",
+                ),
+            )
         for index in sorted(self.session.decisions):
             decision = self.session.decisions[index]
             if decision.status != "rejected":
@@ -397,16 +481,21 @@ class CompareApp(tk.Tk):
                 "",
                 "end",
                 iid=str(index),
-                values=(decision.match.left.path.name, decision.match.right.path.name),
+                values=(index + 1, decision.match.left.path.name, decision.match.right.path.name),
             )
 
-    def _revisit_rejection(self, _event: tk.Event | None = None) -> None:
-        selected = self.rejected_list.selection()
+    def _jump_from_table(
+        self,
+        table: ttk.Treeview,
+        list_name: str,
+        _event: tk.Event | None = None,
+    ) -> None:
+        selected = table.selection()
         if not selected or not self.result:
             return
         self.index = int(selected[0])
         self._show()
-        self.status.set(f"Revisiting rejected pair {self.index + 1} · decision unchanged")
+        self.status.set(f"Jumped from {list_name} list to pair {self.index + 1} · decision unchanged")
 
     def _close(self) -> None:
         self.thumbnail_cache.close()

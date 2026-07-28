@@ -5,6 +5,8 @@ images side by side. It matches close (but not necessarily identical) filenames,
 filters to dorsal (`-D`), ventral (`-V`), or right-side (`-R`) images, and records
 approve/reject decisions without modifying the source images.
 
+[Open the illustrated how-to guide](HOW_TO_USE.html)
+
 ![Beetle Scan Compare rapid-review window](docs/images/rapid-review.png)
 
 ## What it does
@@ -22,6 +24,8 @@ approve/reject decisions without modifying the source images.
   a zoomed image to pan across fine scan details.
 - Keep rejected pairs visible in a right-hand panel and jump back to any
   rejection by double-clicking its filenames.
+- Browse every matched pair in a scrollable navigator showing both filenames,
+  match score, and current decision, then jump directly to any selected pair.
 
 ![Independent zoom and rejected-pair navigation](docs/images/zoom-review.png)
 - Save the in-progress review automatically to the Mac temporary directory.
@@ -85,7 +89,10 @@ For development and tests, use `python -m pip install -e '.[dev]'`.
 8. Rejected pairs appear immediately in the panel on the right. Double-click
    one—or select it and click **Show Selected Pair**—to revisit it. Revisiting
    does not change the saved decision; press **A** if you want to change it.
-9. Click **Export CSV Lists** and choose a permanent output folder.
+9. Use the **All Matched Pairs** tab to scroll through the complete paired list.
+   It includes pair number, both filenames, match score, and decision. Both
+   navigator tabs have vertical and horizontal scrollbars.
+10. Click **Export CSV Lists** and choose a permanent output folder.
 
 The temporary file is:
 
@@ -115,7 +122,7 @@ unmatched export so they can be audited.
 ## CSV outputs
 
 `review_decisions_YYYYMMDD_HHMMSS.csv` contains both filenames, match score,
-decision (`approved`, `rejected`, or `not_reviewed`), and timestamp.
+decision (`approved`, `rejected`, or `not_reviewed`), and timestamp..
 
 `unmatched_images_YYYYMMDD_HHMMSS.csv` contains the folder side, full filename,
 and reason. It reports missing matches in both directions.

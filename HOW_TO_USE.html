@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Beetle Scan Compare — How to Use</title>
+  <style>
+    :root { color-scheme: light dark; --accent: #2368a2; --panel: rgba(127,127,127,.11); }
+    body { font: 17px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      max-width: 980px; margin: 0 auto; padding: 32px 24px 70px; }
+    h1 { font-size: 2.25rem; margin-bottom: .2rem; }
+    h2 { margin-top: 2.2rem; border-bottom: 1px solid #8886; padding-bottom: .35rem; }
+    h3 { margin-top: 1.5rem; }
+    img { display: block; max-width: 100%; height: auto; border: 1px solid #8888;
+      border-radius: 8px; box-shadow: 0 5px 22px #0003; margin: 1rem 0; }
+    code, kbd { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    kbd { border: 1px solid #888; border-bottom-width: 2px; border-radius: 4px;
+      padding: .08rem .35rem; background: var(--panel); }
+    .note { background: var(--panel); border-left: 5px solid var(--accent);
+      padding: .8rem 1rem; border-radius: 4px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { text-align: left; border-bottom: 1px solid #8885; padding: .55rem; }
+    nav a { margin-right: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>Beetle Scan Compare</h1>
+  <p>A practical guide to matching and rapidly reviewing two folders of beetle scan images.</p>
+  <nav>
+    <a href="#install">Install</a>
+    <a href="#match">Match folders</a>
+    <a href="#review">Rapid review</a>
+    <a href="#navigate">Jump around</a>
+    <a href="#export">Export</a>
+  </nav>
+
+  <h2 id="install">1. Install on another Mac</h2>
+  <ol>
+    <li>Open <code>Beetle-Scan-Compare-0.1.0-Apple-Silicon.dmg</code>.</li>
+    <li>Drag <strong>Beetle Scan Compare</strong> to the Applications folder.</li>
+    <li>Open it from Applications. For the unsigned research build, the first
+      launch may require Control-clicking the app and choosing <strong>Open</strong>.</li>
+  </ol>
+  <p class="note">The DMG includes Python and Pillow. No separate dependencies are
+    needed. This build supports Apple Silicon Macs (M1, M2, M3, M4, or newer).</p>
+
+  <h2 id="match">2. Select and match the folders</h2>
+  <ol>
+    <li>Choose Folder 1 and Folder 2.</li>
+    <li>Select Dorsal (<code>-D</code>), Ventral (<code>-V</code>), or Right
+      (<code>-R</code>).</li>
+    <li>Enable subfolders only if the images are nested inside other folders.</li>
+    <li>Leave the minimum match at 82% initially, then click
+      <strong>Match Images</strong>.</li>
+    <li>Read the matched and unmatched counts before starting.</li>
+  </ol>
+  <p class="note">Ambiguous or weak filename matches are reported as unmatched;
+    the program does not silently guess. Source images are never changed.</p>
+
+  <h2 id="review">3. Rapid review</h2>
+  <img src="docs/images/rapid-review.png"
+       alt="Side-by-side rapid review with filenames and rejected-pair panel">
+  <ol>
+    <li>Click <strong>Start Rapid Review</strong>.</li>
+    <li>Press <kbd>A</kbd> to approve or <kbd>R</kbd> to reject. Each decision
+      saves immediately and advances to the next pair.</li>
+    <li>Use the arrow keys or Previous/Next buttons to move without deciding.</li>
+  </ol>
+  <table>
+    <thead><tr><th>Control</th><th>Action</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>A</kbd></td><td>Approve and advance</td></tr>
+      <tr><td><kbd>R</kbd></td><td>Reject and advance</td></tr>
+      <tr><td><kbd>←</kbd> / <kbd>→</kbd></td><td>Previous or next pair</td></tr>
+      <tr><td>Mouse wheel</td><td>Zoom the image under the pointer</td></tr>
+      <tr><td>Click and drag</td><td>Pan a zoomed image</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="navigate">4. Revisit or jump to a pair</h2>
+  <img src="docs/images/zoom-review.png"
+       alt="Independent image zoom and pair navigation">
+  <p>The right-hand <strong>Pair Navigator</strong> contains two tabs:</p>
+  <ul>
+    <li><strong>All Matched Pairs</strong> lists every pair, both filenames,
+      match score, and current decision.</li>
+    <li><strong>Rejected Pairs</strong> contains only current rejections.</li>
+  </ul>
+  <p>Use the vertical or horizontal scrollbar, then double-click a row—or select
+    it and click <strong>Show Selected Pair</strong>—to jump to that pair.
+    Jumping does not change the saved decision. Press <kbd>A</kbd> or
+    <kbd>R</kbd> if you want to replace it.</p>
+
+  <h2 id="export">5. Save the review</h2>
+  <p>Click <strong>Export CSV Lists</strong> and choose a permanent output folder.
+    The app creates:</p>
+  <ul>
+    <li>a timestamped review-decision CSV containing every matched pair; and</li>
+    <li>a timestamped unmatched-image CSV reporting files from both folders.</li>
+  </ul>
+  <p>The in-progress review is also autosaved after every decision in the Mac
+    temporary folder as <code>beetle-scan-compare/current_review.csv</code>.</p>
+</body>
+</html>

@@ -46,7 +46,7 @@ def main() -> None:
     app.after(500, app._load)
     app.after(1800, lambda: app.session and app.session.decide(0, "rejected"))
     app.after(1900, lambda: app.session and app.session.decide(2, "rejected"))
-    app.after(2000, app._refresh_rejections)
+    app.after(2000, app._refresh_pair_lists)
     app.after(2100, lambda: setattr(app, "index", 2))
     app.after(2200, app._show)
     app.after(8000, lambda: app._activate_image("right"))

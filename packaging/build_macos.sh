@@ -13,7 +13,7 @@ if [[ ! -x "$BUILD_ENV/bin/pyinstaller" ]]; then
   exit 1
 fi
 
-rm -rf build "dist/$APP_NAME.app" "dist/dmg-root" "$APP_NAME.spec"
+rm -rf build "dist/$APP_NAME.app" "$APP_NAME.spec"
 
 "$BUILD_ENV/bin/pyinstaller" \
   --noconfirm \
@@ -25,14 +25,22 @@ rm -rf build "dist/$APP_NAME.app" "dist/dmg-root" "$APP_NAME.spec"
   --target-arch arm64 \
   packaging/macos_entry.py
 
-mkdir -p "dist/dmg-root"
-cp -R "dist/$APP_NAME.app" "dist/dmg-root/"
-ln -s /Applications "dist/dmg-root/Applications"
+STAGING_DIR="$(mktemp -d /private/tmp/beetle-scan-dmg.XXXXXX)"
+if [[ "$STAGING_DIR" != /private/tmp/beetle-scan-dmg.* ]]; then
+  echo "Unexpected DMG staging path: $STAGING_DIR"
+  exit 1
+fi
+
+# -X prevents Dropbox/Finder extended attributes from invalidating signing.
+cp -R -X "dist/$APP_NAME.app" "$STAGING_DIR/"
+ln -s /Applications "$STAGING_DIR/Applications"
+codesign --force --deep --sign - "$STAGING_DIR/$APP_NAME.app"
+codesign --verify --deep --strict "$STAGING_DIR/$APP_NAME.app"
 
 rm -f "dist/$DMG_NAME"
 hdiutil create \
   -volname "$APP_NAME" \
-  -srcfolder "dist/dmg-root" \
+  -srcfolder "$STAGING_DIR" \
   -ov \
   -format UDZO \
   "dist/$DMG_NAME"

@@ -21,6 +21,10 @@ filenames. Selecting an entry navigates back to the original pair index without
 changing the decision; a later approve action replaces the rejection in both
 the sidebar and autosaved CSV.
 
+The sidebar also contains an All Matched Pairs table with pair number, both
+filenames, fuzzy-match score, and live decision state. Both tables provide
+horizontal and vertical scrolling and preserve stable match-index navigation.
+
 ## Data flow
 
 ```text
