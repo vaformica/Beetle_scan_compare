@@ -1,9 +1,11 @@
 .DS_Store
 .venv/
+.venv-build/
 __pycache__/
 *.py[cod]
 .pytest_cache/
 .ruff_cache/
+.pyinstaller-cache/
 build/
 dist/
 *.egg-info/

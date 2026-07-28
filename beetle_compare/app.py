@@ -19,12 +19,12 @@ from .session import ReviewSession
 class ThumbnailCache:
     """Decode upcoming images off the GUI thread and retain recent thumbnails."""
 
-    def __init__(self, maximum_items: int = 40) -> None:
+    def __init__(self, maximum_items: int = 280) -> None:
         self.maximum_items = maximum_items
         self.images: OrderedDict[tuple[Path, int, int], Image.Image] = OrderedDict()
         self.futures: dict[tuple[Path, int, int], Future[Image.Image]] = {}
         self.lock = Lock()
-        self.executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="image-prefetch")
+        self.executor = ThreadPoolExecutor(max_workers=4, thread_name_prefix="image-prefetch")
 
     @staticmethod
     def _dimensions(width: int, height: int) -> tuple[int, int]:
@@ -146,7 +146,14 @@ class CompareApp(tk.Tk):
         ttk.Button(view_frame, text="Match Images", command=self._load).pack(side="left", padx=12)
         controls.columnconfigure(1, weight=1)
 
-        names = ttk.Frame(self, padding=(12, 4))
+        review_area = ttk.Panedwindow(self, orient="horizontal")
+        review_area.pack(fill="both", expand=True)
+        comparison_area = ttk.Frame(review_area)
+        rejected_area = ttk.Frame(review_area, padding=(8, 4, 12, 8))
+        review_area.add(comparison_area, weight=5)
+        review_area.add(rejected_area, weight=1)
+
+        names = ttk.Frame(comparison_area, padding=(12, 4))
         names.pack(fill="x")
         self.left_name = ttk.Label(names, text="Folder 1 image", anchor="center", font=("TkDefaultFont", 13, "bold"))
         self.right_name = ttk.Label(names, text="Folder 2 image", anchor="center", font=("TkDefaultFont", 13, "bold"))
@@ -154,7 +161,7 @@ class CompareApp(tk.Tk):
         self.right_name.grid(row=0, column=1, sticky="ew", padx=4)
         names.columnconfigure((0, 1), weight=1)
 
-        images = ttk.Frame(self, padding=(12, 0))
+        images = ttk.Frame(comparison_area, padding=(12, 0))
         images.pack(fill="both", expand=True)
         self.left_image = tk.Canvas(images, background="#181818", highlightthickness=2)
         self.right_image = tk.Canvas(images, background="#181818", highlightthickness=2)
@@ -169,6 +176,34 @@ class CompareApp(tk.Tk):
         images.rowconfigure(0, weight=1)
         self.image_frame = images
         self._activate_image("left")
+
+        ttk.Label(rejected_area, text="Rejected Pairs", font=("TkDefaultFont", 13, "bold")).pack(
+            anchor="w", pady=(0, 2)
+        )
+        ttk.Label(rejected_area, text="Double-click a pair to revisit it.", foreground="#555555").pack(
+            anchor="w", pady=(0, 8)
+        )
+        rejected_scroll = ttk.Scrollbar(rejected_area, orient="vertical")
+        rejected_scroll.pack(side="right", fill="y")
+        self.rejected_list = ttk.Treeview(
+            rejected_area,
+            columns=("left", "right"),
+            show="headings",
+            selectmode="browse",
+            yscrollcommand=rejected_scroll.set,
+            height=18,
+        )
+        self.rejected_list.heading("left", text="Folder 1")
+        self.rejected_list.heading("right", text="Folder 2")
+        self.rejected_list.column("left", width=150, minwidth=90)
+        self.rejected_list.column("right", width=150, minwidth=90)
+        self.rejected_list.pack(fill="both", expand=True)
+        rejected_scroll.configure(command=self.rejected_list.yview)
+        self.rejected_list.bind("<Double-1>", self._revisit_rejection)
+        self.rejected_list.bind("<Return>", self._revisit_rejection)
+        ttk.Button(rejected_area, text="Show Selected Pair", command=self._revisit_rejection).pack(
+            fill="x", pady=(8, 0)
+        )
 
         footer = ttk.Frame(self, padding=12)
         footer.pack(fill="x")
@@ -209,6 +244,7 @@ class CompareApp(tk.Tk):
         self.index = 0
         self.rapid = False
         self.zoom = {"left": 1.0, "right": 1.0}
+        self._refresh_rejections()
         self._show()
         self.status.set(
             f"{len(self.result.matches)} pairs · "
@@ -269,8 +305,9 @@ class CompareApp(tk.Tk):
             return
         width = max(320, self.image_frame.winfo_width() // 2 - 20)
         height = max(320, self.image_frame.winfo_height() - 20)
-        # Keep several pairs ready even during very fast keyboard review.
-        upcoming = range(self.index + 1, min(self.index + 9, len(self.result.matches)))
+        # Keep up to 120 complete pairs ready. This covers the user's typical
+        # review in one pass while the 280-thumbnail LRU remains memory-bounded.
+        upcoming = range(self.index + 1, min(self.index + 121, len(self.result.matches)))
         for index in upcoming:
             match = self.result.matches[index]
             self.thumbnail_cache.prefetch(match.left.path, width, height)
@@ -332,6 +369,7 @@ class CompareApp(tk.Tk):
             return
         self.rapid = True
         self.session.decide(self.index, status)
+        self._refresh_rejections()
         if self.index < len(self.result.matches) - 1:
             self.index += 1
         self._show()
@@ -344,6 +382,31 @@ class CompareApp(tk.Tk):
         if destination:
             decisions, unmatched = self.session.export(Path(destination))
             messagebox.showinfo("Export complete", f"Saved:\n{decisions.name}\n{unmatched.name}")
+
+    def _refresh_rejections(self) -> None:
+        children = self.rejected_list.get_children()
+        if children:
+            self.rejected_list.delete(*children)
+        if not self.session:
+            return
+        for index in sorted(self.session.decisions):
+            decision = self.session.decisions[index]
+            if decision.status != "rejected":
+                continue
+            self.rejected_list.insert(
+                "",
+                "end",
+                iid=str(index),
+                values=(decision.match.left.path.name, decision.match.right.path.name),
+            )
+
+    def _revisit_rejection(self, _event: tk.Event | None = None) -> None:
+        selected = self.rejected_list.selection()
+        if not selected or not self.result:
+            return
+        self.index = int(selected[0])
+        self._show()
+        self.status.set(f"Revisiting rejected pair {self.index + 1} · decision unchanged")
 
     def _close(self) -> None:
         self.thumbnail_cache.close()

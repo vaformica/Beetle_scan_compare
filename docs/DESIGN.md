@@ -7,13 +7,19 @@ sequence of pairs, two large images at equal scale, persistent filenames, and
 single-key decisions.
 
 The first visible pair is decoded immediately. Upcoming pairs are decoded and
-resized by background workers and retained in a bounded in-memory thumbnail
-cache. This keeps navigation responsive without loading the entire dataset into
-memory.
+resized by four background workers. Up to 120 forthcoming pairs are scheduled,
+and a bounded in-memory cache retains 280 thumbnails. This avoids the slowdown
+that occurred when rapid review exhausted the earlier 20-pair buffer while
+still placing an upper bound on retained image memory.
 
 Each image canvas has an independent 100–400% zoom level. Mouse-wheel zoom is
 applied to the image under the pointer, while toolbar zoom applies to the canvas
 with the blue active outline. Zoomed canvases can be panned by dragging.
+
+Rejected decisions are mirrored into an in-session sidebar that shows both
+filenames. Selecting an entry navigates back to the original pair index without
+changing the decision; a later approve action replaces the rejection in both
+the sidebar and autosaved CSV.
 
 ## Data flow
 

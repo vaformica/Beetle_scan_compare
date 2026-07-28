@@ -5,6 +5,8 @@ images side by side. It matches close (but not necessarily identical) filenames,
 filters to dorsal (`-D`), ventral (`-V`), or right-side (`-R`) images, and records
 approve/reject decisions without modifying the source images.
 
+![Beetle Scan Compare rapid-review window](docs/images/rapid-review.png)
+
 ## What it does
 
 - Select any two folders from the GUI.
@@ -14,9 +16,14 @@ approve/reject decisions without modifying the source images.
 - Start **Rapid Review**, then press **A** to approve or **R** to reject. Each
   decision immediately advances to the next pair.
 - Use the left/right arrow keys or onscreen buttons to move through the list.
-- Prefetch upcoming images in the background for near-instant rapid navigation.
+- Prefetch up to 120 upcoming pairs with four background workers and retain a
+  bounded thumbnail cache for sustained rapid navigation.
 - Zoom each image independently with the mouse wheel or zoom buttons, and drag
   a zoomed image to pan across fine scan details.
+- Keep rejected pairs visible in a right-hand panel and jump back to any
+  rejection by double-clicking its filenames.
+
+![Independent zoom and rejected-pair navigation](docs/images/zoom-review.png)
 - Save the in-progress review automatically to the Mac temporary directory.
 - Export a complete decision CSV and a separate two-way unmatched-image CSV.
 - Leave ambiguous near-matches unmatched rather than silently choosing one.
@@ -25,6 +32,20 @@ Source images are read-only. The application does not rename, move, copy, or
 delete them.
 
 ## Install on a Mac
+
+### DMG installation (recommended)
+
+Download `Beetle-Scan-Compare-0.1.0-Apple-Silicon.dmg`, open it, and drag
+**Beetle Scan Compare** into the Applications folder shown in the installer.
+The app bundle contains Python, Pillow, and the other runtime components; the
+other Mac does not need to install dependencies separately.
+
+The current DMG is for Apple Silicon Macs (M1, M2, M3, M4, or newer). Because
+this is an unsigned research build, macOS may require a Control-click on the app
+followed by **Open** the first time. Do not bypass a warning for a copy received
+from an untrusted source.
+
+### Installation from source
 
 Python 3.10 or newer is required. In Terminal:
 
@@ -61,7 +82,10 @@ For development and tests, use `python -m pip install -e '.[dev]'`.
 7. To inspect a detail, move the pointer over either image and scroll to zoom.
    Drag the image to pan. The blue outline shows which image the zoom buttons
    control; **100%** returns that image to fit-to-window view.
-8. Click **Export CSV Lists** and choose a permanent output folder.
+8. Rejected pairs appear immediately in the panel on the right. Double-click
+   one—or select it and click **Show Selected Pair**—to revisit it. Revisiting
+   does not change the saved decision; press **A** if you want to change it.
+9. Click **Export CSV Lists** and choose a permanent output folder.
 
 The temporary file is:
 

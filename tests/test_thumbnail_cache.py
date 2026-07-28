@@ -18,3 +18,11 @@ def test_thumbnail_cache_prefetches_and_reuses_image(tmp_path: Path):
         assert first.height <= 500
     finally:
         cache.close()
+
+
+def test_default_cache_covers_typical_full_review():
+    cache = ThumbnailCache()
+    try:
+        assert cache.maximum_items >= 2 * 120
+    finally:
+        cache.close()

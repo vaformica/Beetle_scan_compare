@@ -15,6 +15,20 @@ changes must preserve one-to-one pairing and include tests for ambiguous cases.
 Never add behavior that modifies source images without an explicit, separately
 reviewed design change.
 
+## Build the Apple Silicon DMG
+
+Create a dedicated Python 3.12 build environment, install the packaging
+dependencies, then run:
+
+```bash
+python3.12 -m venv .venv-build
+.venv-build/bin/python -m pip install pyinstaller Pillow
+./packaging/build_macos.sh
+```
+
+The standalone app and DMG are written beneath `dist/`. Build artifacts are
+excluded from Git.
+
 ## Pull requests
 
 Describe the user-visible change, add or update tests, and note any change to
