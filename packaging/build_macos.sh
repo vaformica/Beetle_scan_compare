@@ -48,6 +48,8 @@ hdiutil create \
 
 DMG_SHA256="$(shasum -a 256 "dist/$DMG_NAME" | awk '{print $1}')"
 cp "packaging/GITHUB_RELEASE_SUMMARY.txt" "dist/GITHUB_RELEASE_SUMMARY.txt"
+cp "packaging/GITHUB_DESKTOP_COMMIT_SUMMARY.txt" "dist/GITHUB_DESKTOP_COMMIT_SUMMARY.txt"
+cp "packaging/GITHUB_DESKTOP_COMMIT_DESCRIPTION.txt" "dist/GITHUB_DESKTOP_COMMIT_DESCRIPTION.txt"
 {
   cat "packaging/GITHUB_RELEASE_TEMPLATE.md"
   echo
@@ -60,3 +62,5 @@ cp "packaging/GITHUB_RELEASE_SUMMARY.txt" "dist/GITHUB_RELEASE_SUMMARY.txt"
 echo "Created dist/$DMG_NAME"
 echo "Created dist/GITHUB_RELEASE_SUMMARY.txt"
 echo "Created dist/GITHUB_RELEASE_DESCRIPTION.md"
+echo "Created dist/GITHUB_DESKTOP_COMMIT_SUMMARY.txt"
+echo "Created dist/GITHUB_DESKTOP_COMMIT_DESCRIPTION.txt"

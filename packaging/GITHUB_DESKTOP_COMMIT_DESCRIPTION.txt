@@ -1,0 +1,5 @@
+- Add scrollable all-matches and rejected-pairs navigation.
+- Improve sustained image preloading, zoom, and review documentation.
+- Add the approved two-FFB app icon to the README, HTML guide, and DMG.
+- Generate paste-ready GitHub release notes and checksum information.
+- Keep research images read-only and excluded from publication.

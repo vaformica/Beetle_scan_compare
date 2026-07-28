@@ -1,5 +1,12 @@
 # Contributing
 
+## Documentation identity convention
+
+When a repository has a project icon, keep it prominently at the top of the
+main `README.md` and every user-facing how-to HTML page. The icon is a visual
+identifier that helps distinguish projects quickly, so do not move it into a
+footer or secondary branding section.
+
 ## Development setup
 
 ```bash
@@ -34,6 +41,16 @@ Every successful build also creates two paste-ready GitHub files:
 - `dist/GITHUB_RELEASE_SUMMARY.txt` for the short release summary; and
 - `dist/GITHUB_RELEASE_DESCRIPTION.md` for the full description, artifact name,
   and automatically calculated SHA-256 checksum.
+
+It also creates GitHub Desktop fallback text:
+
+- `dist/GITHUB_DESKTOP_COMMIT_SUMMARY.txt`; and
+- `dist/GITHUB_DESKTOP_COMMIT_DESCRIPTION.txt`.
+
+When GitHub Copilot is available in GitHub Desktop, click **Generate commit
+message with Copilot** beside the Summary field instead. The repository-wide
+`.github/copilot-instructions.md` file guides the generated Summary and
+Description automatically.
 
 Update `packaging/GITHUB_RELEASE_TEMPLATE.md` and
 `packaging/GITHUB_RELEASE_SUMMARY.txt` whenever the user-visible release notes
